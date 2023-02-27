@@ -60,7 +60,7 @@ export default function NewImage() {
         try {
             const attachment = file.current ? await s3Upload(file.current) : null;
 
-            await createImage({content, attachment});
+            await createImage({title : content, attachment: attachment});
             nav("/");
         } catch (e) {
             onError(e);
