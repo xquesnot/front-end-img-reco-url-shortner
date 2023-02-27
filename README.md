@@ -1,5 +1,5 @@
-# front-end-img-reco-url-shortner
-Front End URL SHORTNER
+# front-end-img-
+Front End
 
 ### `npm start`
 
@@ -24,6 +24,10 @@ You may also see any lint errors in the console.
 ## Technical informations
 
 This project use node v14.17.3, and AWS Apmlify
+
+## EVOLUTIONS
+- Add URL SHORTNER
+- Add TENSORFLOW IMAGE RECOGNITION
 
 ## Requirements ENV 
 
