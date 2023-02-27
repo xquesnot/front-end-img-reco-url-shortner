@@ -17,9 +17,6 @@ You may also see any lint errors in the console.
 - Public list images
 - Personal space ( List user's images (public or private) / manage profil / logout)
 
-## Requirements
-- 
-
 ## Libraires
 - [ReactJS - latest (CRA)](https://reactjs.org/)
 - [ReactRouter](https://reactrouter.com/en/main)
