@@ -1,0 +1,10 @@
+.classified-image {
+    width: 400px;
+    height: 400px;
+    max-width: calc(100vw - 100px);
+    max-height: calc(100vw - 100px);
+    border-radius: 10px;
+    margin: 20px;
+    box-shadow: 4px 4px 6px 1px lightgray;
+
+}

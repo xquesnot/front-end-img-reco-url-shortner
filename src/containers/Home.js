@@ -6,6 +6,7 @@ import "./Home.css";
 import {API} from "aws-amplify";
 import {LinkContainer} from "react-router-bootstrap";
 import {BsPencilSquare} from "react-icons/bs";
+import TagsContainer from "../components/TagsContainers";
 
 export default function Home() {
     const [images, setImages] = useState([]);
@@ -44,13 +45,15 @@ export default function Home() {
                         <span className="ml-2 font-weight-bold">Add a new image</span>
                     </ListGroup.Item>
                 </LinkContainer>
-                {images.map(({imageID, title, createdAt, attachment}) => (
+                {images.map(({imageID, title, createdAt, prediction}) => (
 
                     <LinkContainer key={imageID} to={`/images/${imageID}`}>
                         <ListGroup.Item action>
                             <span className="font-weight-bold">
                               {title.trim().split("\n")[0]}
                             </span>
+                            <br/>
+                            {!!prediction.length && <TagsContainer predictions={prediction} />}
                             <br/>
                             <span className="text-muted">
               Created: {new Date(createdAt).toLocaleString()}

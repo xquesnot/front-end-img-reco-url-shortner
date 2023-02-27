@@ -6,7 +6,10 @@ import LoaderButton from "../components/LoaderButton";
 import {onError} from "../lib/errorLib";
 import config from "../config";
 import {s3Upload} from "../lib/awsLib";
-
+import "@tensorflow/tfjs";
+import * as mobileNet from "@tensorflow-models/mobilenet";
+import TagsContainer from "../components/TagsContainers";
+import "./NewImage.css";
 export default function NewImage() {
     const file = useRef(null);
     const nav = useNavigate();
@@ -14,6 +17,18 @@ export default function NewImage() {
     const [isLoading, setIsLoading] = useState(false);
     const [selectedFile, setSelectedFile] = useState();
     const [preview, setPreview] = useState();
+
+    const [model, setModel] = useState(null);
+    const [predictions, setPredictions] = useState([]);
+    const canvasRef = useRef(null);
+
+    useEffect(() => {
+        const loadModel = async () => {
+            const model = await mobileNet.load();
+            setModel(model);
+        };
+        loadModel();
+    }, []);
 
     useEffect(() => {
         if (!selectedFile) {
@@ -28,6 +43,49 @@ export default function NewImage() {
         return () => URL.revokeObjectURL(objectUrl)
     }, [selectedFile])
 
+    const drawImageOnCanvas = (image, canvas, ctx) => {
+        const naturalWidth = image.naturalWidth;
+        const naturalHeight = image.naturalHeight;
+        canvas.width = image.width;
+        canvas.height = image.height;
+
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        const isLandscape = naturalWidth > naturalHeight;
+        ctx.drawImage(
+            image,
+            isLandscape ? (naturalWidth - naturalHeight) / 2 : 0,
+            isLandscape ? 0 : (naturalHeight - naturalWidth) / 2,
+            isLandscape ? naturalHeight : naturalWidth,
+            isLandscape ? naturalHeight : naturalWidth,
+            0,
+            0,
+            ctx.canvas.width,
+            ctx.canvas.height
+        );
+    };
+
+    const onImageChange = async ({ target }) => {
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext("2d");
+        drawImageOnCanvas(target, canvas, ctx);
+
+        const predictions = await model.classify(canvas, 5);
+        console.log(predictions)
+        setPredictions(predictions);
+    };
+
+    const renderPreview = () => (
+        <Form.Group>
+            <Form.Label>Preview</Form.Label>
+            <div>
+                <canvas className="classified-image" ref={canvasRef}>
+                    <img alt="preview" onLoad={onImageChange} src={preview} />
+                </canvas>
+            </div>
+        </Form.Group>
+
+    );
+
     function validateForm() {
         return content.length > 0;
     }
@@ -38,7 +96,6 @@ export default function NewImage() {
             return
         }
 
-        // I've kept this example simple by using the first image instead of multiple
         setSelectedFile(e.target.files[0])
 
         file.current = e.target.files[0];
@@ -60,7 +117,7 @@ export default function NewImage() {
         try {
             const attachment = file.current ? await s3Upload(file.current) : null;
 
-            await createImage({title : content, attachment: attachment});
+            await createImage({title : content, attachment: attachment, prediction: predictions});
             nav("/");
         } catch (e) {
             onError(e);
@@ -78,7 +135,7 @@ export default function NewImage() {
         <div className="NewNote">
             <Form onSubmit={handleSubmit}>
                 <Form.Group controlId="title">
-                    <Form.Label>Title</Form.Label>
+                    <Form.Label>Title of your test recognition</Form.Label>
                     <Form.Control
                         value={content}
                         as="input"
@@ -87,16 +144,11 @@ export default function NewImage() {
                 </Form.Group>
                 <Form.Group controlId="file">
                     <Form.Label>Attachment (.png, .jpg, .jpeg )</Form.Label>
+
                     <Form.Control accept='.png, .jpg, .jpeg' onChange={handleFileChange} type="file"/>
                 </Form.Group>
-                {selectedFile &&
-                    <Form.Group>
-                        <Form.Label>Preview</Form.Label>
-                        <div>
-                            <img src={preview} alt="preview" height={200}/>
-                        </div>
-                    </Form.Group>
-                }
+                {selectedFile && renderPreview()}
+                {!!predictions.length && <TagsContainer predictions={predictions} />}
                 <LoaderButton
                     block
                     type="submit"
