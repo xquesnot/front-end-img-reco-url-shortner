@@ -11,11 +11,10 @@ You may also see any lint errors in the console.
 
 ## Features 
 
-- Upload image public
+- Upload image 
 - Sign in
 - Sign up
-- Public list images
-- Personal space ( List user's images (public or private) / manage profil / logout)
+- Personal space ( List user's images / manage profil / logout)
 
 ## Libraires
 - [ReactJS - latest (CRA)](https://reactjs.org/)
