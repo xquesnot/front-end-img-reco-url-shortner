@@ -1,7 +1,8 @@
 const config = {
+    MAX_ATTACHMENT_SIZE: 5000000,
     // Backend config
     s3: {
-        REGION: process.env.REACT_APP_REGION,
+        REGION_BUCKET: process.env.REACT_APP_REGION_BUCKET,
         BUCKET: process.env.REACT_APP_BUCKET,
     },
     apiGateway: {
