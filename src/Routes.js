@@ -4,6 +4,7 @@ import NotFound from "./containers/NotFound";
 import Login from "./containers/Login";
 import Signup from "./containers/Signup";
 import NewImage from "./containers/NewImage";
+import Image from "./containers/Image";
 import AuthenticatedRoute from "./components/AuthenticatedRoutes";
 import UnauthenticatedRoute from "./components/UnauthenticatedRoutes";
 import Home from "./containers/Home";
@@ -32,6 +33,14 @@ export default function Links() {
                 element={
                     <AuthenticatedRoute>
                         <NewImage />
+                    </AuthenticatedRoute>
+                }
+            />
+            <Route
+                path="/images/:id"
+                element={
+                    <AuthenticatedRoute>
+                        <Image />
                     </AuthenticatedRoute>
                 }
             />
