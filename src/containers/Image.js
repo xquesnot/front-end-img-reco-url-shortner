@@ -1,5 +1,5 @@
 import React, {useRef, useState, useEffect} from "react";
-import {useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import {API, Storage} from "aws-amplify";
 import {onError} from "../lib/errorLib";
 import LoaderButton from "../components/LoaderButton";
@@ -10,6 +10,7 @@ import "./Images.css";
 export default function Images() {
     const file = useRef(null);
     const {id} = useParams();
+    const nav = useNavigate();
     const [image, setImage] = useState(null);
     const [content, setContent] = useState("");
     const [isLoading, setIsLoading] = useState(false);
@@ -39,6 +40,32 @@ export default function Images() {
         onLoad();
     }, [id]);
 
+    function deleteImage() {
+        return API.del("images", `/images/${id}`);
+    }
+
+    async function handleDelete(event) {
+        event.preventDefault();
+
+        const confirmed = window.confirm(
+            "Are you sure you want to delete this image?"
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        setIsDeleting(true);
+
+        try {
+            await deleteImage();
+            nav("/");
+        } catch (e) {
+            onError(e);
+            setIsDeleting(false);
+        }
+    }
+
     function validateForm() {
         return content.length > 0;
     }
@@ -47,13 +74,13 @@ export default function Images() {
         return str.replace(/^\w+-/, "");
     }
 
-    function handleFileChange(event) {
-        file.current = event.target.files[0];
+    function saveImage(note) {
+        return API.put("images", `/images/${id}`, {
+            body: note,
+        });
     }
 
     async function handleSubmit(event) {
-        let attachment;
-
         event.preventDefault();
 
         if (file.current && file.current.size > config.MAX_ATTACHMENT_SIZE) {
@@ -66,20 +93,17 @@ export default function Images() {
         }
 
         setIsLoading(true);
-    }
 
-    async function handleDelete(event) {
-        event.preventDefault();
-
-        const confirmed = window.confirm(
-            "Are you sure you want to delete this note?"
-        );
-
-        if (!confirmed) {
-            return;
+        try {
+            await saveImage({
+                title: content,
+                attachment: image.attachment,
+            });
+            nav("/");
+        } catch (e) {
+            onError(e);
+            setIsLoading(false);
         }
-
-        setIsDeleting(true);
     }
 
     return (
@@ -111,7 +135,6 @@ export default function Images() {
                             </p>
                         )}
 
-                        <Form.Control onChange={handleFileChange} type="file"/>
                     </Form.Group>
                     <LoaderButton
                         block="true"
