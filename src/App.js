@@ -6,6 +6,7 @@ import {Nav, Navbar} from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 import { AppContext } from "./lib/contextLib";
 import {useNavigate} from "react-router-dom";
+import {onError} from "./lib/errorLib";
 
 
 function App() {
@@ -20,7 +21,7 @@ function App() {
                 userHasAuthenticated(true);
             } catch (e) {
                 if (e !== "No current user") {
-                    alert(e);
+                    onError(e);
                 }
             }
 
@@ -43,7 +44,7 @@ function App() {
                 <Navbar collapseOnSelect bg="light" expand="md" className="mb-3">
                     <LinkContainer to="/">
                         <Navbar.Brand className="font-weight-bold text-muted">
-                            Scratch
+                            Imag.Reco
                         </Navbar.Brand>
                     </LinkContainer>
                     <Navbar.Toggle />
